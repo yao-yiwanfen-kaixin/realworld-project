@@ -97,6 +97,7 @@ public class ArticleServiceImpl implements ArticleService {
         Page<Article> articlePage = articleMapper.selectPage(page, wrapper);
         
         User currentUser = userEmail != null ? getUserByEmail(userEmail) : null;
+        
         return articlePage.getRecords().stream()
                 .map(article -> {
                     User articleAuthor = userMapper.selectById(article.getAuthorId());
@@ -109,18 +110,18 @@ public class ArticleServiceImpl implements ArticleService {
     public ArticleVO favoriteArticle(String userEmail, String slug) {
         User user = getUserByEmail(userEmail);
         Article article = getArticleBySlug(slug);
-
+        
         LambdaQueryWrapper<ArticleFavorite> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ArticleFavorite::getUserId, user.getId())
                 .eq(ArticleFavorite::getArticleId, article.getId());
-
+        
         if (articleFavoriteMapper.selectOne(wrapper) == null) {
             ArticleFavorite favorite = new ArticleFavorite();
             favorite.setUserId(user.getId());
             favorite.setArticleId(article.getId());
             articleFavoriteMapper.insert(favorite);
         }
-
+        
         User author = userMapper.selectById(article.getAuthorId());
         return convertToVO(article, author, user);
     }
@@ -129,16 +130,16 @@ public class ArticleServiceImpl implements ArticleService {
     public ArticleVO unfavoriteArticle(String userEmail, String slug) {
         User user = getUserByEmail(userEmail);
         Article article = getArticleBySlug(slug);
-
+        
         LambdaQueryWrapper<ArticleFavorite> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ArticleFavorite::getUserId, user.getId())
                 .eq(ArticleFavorite::getArticleId, article.getId());
-
+        
         ArticleFavorite favorite = articleFavoriteMapper.selectOne(wrapper);
         if (favorite != null) {
             articleFavoriteMapper.deleteById(favorite.getId());
         }
-
+        
         User author = userMapper.selectById(article.getAuthorId());
         return convertToVO(article, author, user);
     }
@@ -176,20 +177,21 @@ public class ArticleServiceImpl implements ArticleService {
         vo.setCreatedAt(article.getCreatedAt());
         vo.setUpdatedAt(article.getUpdatedAt());
         vo.setTagList(new ArrayList<>());
-
+        
         AuthorVO authorVO = new AuthorVO();
         authorVO.setUsername(author.getUsername());
         authorVO.setBio(author.getBio());
         authorVO.setImage(author.getImage());
         authorVO.setFollowing(false);
         vo.setAuthor(authorVO);
-
-        // 计算点赞数和是否点赞
+        
+        // 计算点赞数
         LambdaQueryWrapper<ArticleFavorite> countWrapper = new LambdaQueryWrapper<>();
         countWrapper.eq(ArticleFavorite::getArticleId, article.getId());
         int favoritesCount = articleFavoriteMapper.selectCount(countWrapper).intValue();
         vo.setFavoritesCount(favoritesCount);
-
+        
+        // 检查当前用户是否点赞
         if (currentUser != null) {
             LambdaQueryWrapper<ArticleFavorite> favoriteWrapper = new LambdaQueryWrapper<>();
             favoriteWrapper.eq(ArticleFavorite::getUserId, currentUser.getId())
@@ -198,7 +200,7 @@ public class ArticleServiceImpl implements ArticleService {
         } else {
             vo.setFavorited(false);
         }
-
+        
         return vo;
     }
 }
