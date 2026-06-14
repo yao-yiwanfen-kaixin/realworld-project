@@ -58,16 +58,20 @@ public class ArticleController {
             @RequestParam(required = false) String tag,
             @RequestParam(required = false) String author,
             @RequestParam(required = false) String favorited,
-            @RequestParam(defaultValue = "20") Integer limit,
-            @RequestParam(defaultValue = "0") Integer offset) {
-
+            @RequestParam(required = false, defaultValue = "20") Integer limit,
+            @RequestParam(required = false, defaultValue = "0") Integer offset) {
+        
         String userEmail = null;
         try {
-            userEmail = getCurrentUserEmail();
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() != null 
+                    && !"anonymousUser".equals(authentication.getPrincipal())) {
+                userEmail = (String) authentication.getPrincipal();
+            }
         } catch (Exception e) {
-            // 未登录用户
+            // 未登录用户，继续执行
         }
-
+        
         List<ArticleVO> articles = articleService.listArticles(userEmail, tag, author, favorited, limit, offset);
         Map<String, Object> response = new HashMap<>();
         response.put("articles", articles);
@@ -95,7 +99,8 @@ public class ArticleController {
 
     private String getCurrentUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication.getPrincipal() == null) {
+        if (authentication == null || authentication.getPrincipal() == null 
+                || "anonymousUser".equals(authentication.getPrincipal())) {
             throw new RuntimeException("未登录");
         }
         return (String) authentication.getPrincipal();
