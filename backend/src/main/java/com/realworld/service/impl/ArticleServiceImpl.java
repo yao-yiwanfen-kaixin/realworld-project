@@ -34,16 +34,13 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public ArticleVO createArticle(String userEmail, ArticleRequest request) {
         User author = getUserByEmail(userEmail);
-
         Article article = new Article();
         article.setTitle(request.getTitle());
         article.setDescription(request.getDescription());
         article.setBody(request.getBody());
         article.setAuthorId(author.getId());
         article.setSlug(generateSlug(request.getTitle()));
-
         articleMapper.insert(article);
-
         return convertToVO(article, author, null);
     }
 
@@ -58,11 +55,9 @@ public class ArticleServiceImpl implements ArticleService {
     public ArticleVO updateArticle(String userEmail, String slug, ArticleRequest request) {
         User user = getUserByEmail(userEmail);
         Article article = getArticleBySlug(slug);
-
         if (!article.getAuthorId().equals(user.getId())) {
             throw new RuntimeException("无权限修改此文章");
         }
-
         if (request.getTitle() != null) {
             article.setTitle(request.getTitle());
             article.setSlug(generateSlug(request.getTitle()));
@@ -73,9 +68,7 @@ public class ArticleServiceImpl implements ArticleService {
         if (request.getBody() != null) {
             article.setBody(request.getBody());
         }
-
         articleMapper.updateById(article);
-
         return convertToVO(article, user, null);
     }
 
@@ -83,24 +76,27 @@ public class ArticleServiceImpl implements ArticleService {
     public void deleteArticle(String userEmail, String slug) {
         User user = getUserByEmail(userEmail);
         Article article = getArticleBySlug(slug);
-
         if (!article.getAuthorId().equals(user.getId())) {
             throw new RuntimeException("无权限删除此文章");
         }
-
         articleMapper.deleteById(article.getId());
     }
 
     @Override
     public List<ArticleVO> listArticles(String userEmail, String tag, String author, String favorited, Integer limit, Integer offset) {
+        // 设置默认值，避免空指针和除零错误
+        int pageLimit = (limit != null && limit > 0) ? limit : 20;
+        int pageOffset = (offset != null && offset >= 0) ? offset : 0;
+        
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
         wrapper.orderByDesc(Article::getCreatedAt);
-
-        Page<Article> page = new Page<>(offset / limit + 1, limit);
+        
+        // 计算页码：MyBatis Plus 页码从1开始
+        int currentPage = pageOffset / pageLimit + 1;
+        Page<Article> page = new Page<>(currentPage, pageLimit);
         Page<Article> articlePage = articleMapper.selectPage(page, wrapper);
-
+        
         User currentUser = userEmail != null ? getUserByEmail(userEmail) : null;
-
         return articlePage.getRecords().stream()
                 .map(article -> {
                     User articleAuthor = userMapper.selectById(article.getAuthorId());
