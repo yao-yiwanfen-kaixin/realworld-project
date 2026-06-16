@@ -2,39 +2,37 @@
   <div class="auth-page">
     <div class="container">
       <div class="auth-form">
-        <h1 class="text-xs-center">注册</h1>
+        <h1 class="text-xs-center">Sign Up</h1>
         <p class="text-xs-center">
-          <router-link to="/login">已有账号？去登录</router-link>
+          <router-link to="/login">Have an account?</router-link>
         </p>
-
         <el-form :model="form" @submit.prevent="submitRegister">
           <el-form-item>
             <el-input
               v-model="form.username"
-              placeholder="用户名"
+              placeholder="Username"
             />
           </el-form-item>
           <el-form-item>
             <el-input
               v-model="form.email"
-              placeholder="邮箱"
+              placeholder="Email"
               type="email"
             />
           </el-form-item>
           <el-form-item>
             <el-input
               v-model="form.password"
-              placeholder="密码"
+              placeholder="Password"
               type="password"
             />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" class="btn-lg" @click="submitRegister" :loading="loading">
-              注册
+              Sign up
             </el-button>
           </el-form-item>
         </el-form>
-
         <el-alert
           v-if="error"
           :title="error"
@@ -70,10 +68,10 @@ const submitRegister = async () => {
   
   try {
     await userStore.register(form.value)
-    ElMessage.success('注册成功')
+    ElMessage.success('Registration successful')
     router.push('/')
   } catch (e) {
-    error.value = e.response?.data?.message || '注册失败，请重试'
+    error.value = e.response?.data?.message || 'Registration failed, please try again'
   } finally {
     loading.value = false
   }
@@ -84,17 +82,14 @@ const submitRegister = async () => {
 .auth-page {
   padding: 3rem 0;
 }
-
 .auth-form {
   max-width: 500px;
   margin: 0 auto;
 }
-
 .text-xs-center {
   text-align: center;
   margin-bottom: 1rem;
 }
-
 .btn-lg {
   width: 100%;
 }

@@ -2,33 +2,31 @@
   <div class="auth-page">
     <div class="container">
       <div class="auth-form">
-        <h1 class="text-xs-center">登录</h1>
+        <h1 class="text-xs-center">Sign In</h1>
         <p class="text-xs-center">
-          <router-link to="/register">还没有账号？去注册</router-link>
+          <router-link to="/register">Need an account?</router-link>
         </p>
-
         <el-form :model="form" @submit.prevent="submitLogin">
           <el-form-item>
             <el-input
               v-model="form.email"
-              placeholder="邮箱"
+              placeholder="Email"
               type="email"
             />
           </el-form-item>
           <el-form-item>
             <el-input
               v-model="form.password"
-              placeholder="密码"
+              placeholder="Password"
               type="password"
             />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" class="btn-lg" @click="submitLogin" :loading="loading">
-              登录
+              Sign in
             </el-button>
           </el-form-item>
         </el-form>
-
         <el-alert
           v-if="error"
           :title="error"
@@ -63,10 +61,10 @@ const submitLogin = async () => {
   
   try {
     await userStore.login(form.value)
-    ElMessage.success('登录成功')
+    ElMessage.success('Login successful')
     router.push('/')
   } catch (e) {
-    error.value = e.response?.data?.message || '登录失败，请检查邮箱和密码'
+    error.value = e.response?.data?.message || 'Login failed, please check email and password'
   } finally {
     loading.value = false
   }
@@ -77,17 +75,14 @@ const submitLogin = async () => {
 .auth-page {
   padding: 3rem 0;
 }
-
 .auth-form {
   max-width: 500px;
   margin: 0 auto;
 }
-
 .text-xs-center {
   text-align: center;
   margin-bottom: 1rem;
 }
-
 .btn-lg {
   width: 100%;
 }

@@ -5,16 +5,16 @@
         <router-link to="/" class="navbar-brand">RealWorld</router-link>
         <ul class="nav">
           <li class="nav-item">
-            <router-link to="/" class="nav-link">首页</router-link>
+            <router-link to="/" class="nav-link">Home</router-link>
           </li>
           <li class="nav-item" v-if="!isLoggedIn">
-            <router-link to="/login" class="nav-link">登录</router-link>
+            <router-link to="/login" class="nav-link">Sign in</router-link>
           </li>
           <li class="nav-item" v-if="!isLoggedIn">
-            <router-link to="/register" class="nav-link">注册</router-link>
+            <router-link to="/register" class="nav-link">Sign up</router-link>
           </li>
           <li class="nav-item" v-if="isLoggedIn">
-            <router-link to="/editor" class="nav-link">写文章</router-link>
+            <router-link to="/editor" class="nav-link">New Article</router-link>
           </li>
           <li class="nav-item" v-if="isLoggedIn">
             <span class="nav-link">{{ user.username }}</span>
