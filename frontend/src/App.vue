@@ -32,7 +32,7 @@ import { useUserStore } from './store/user'
 
 const userStore = useUserStore()
 const isLoggedIn = computed(() => userStore.isLoggedIn)
-const user = computed(() => userStore.user)
+const user = computed(() => userStore.user || { username: '' })
 </script>
 
 <style>
