@@ -55,11 +55,11 @@ public class ArticleController {
 
     @GetMapping
     public ResponseEntity<Map<String, Object>> listArticles(
-            @RequestParam(required = false) String tag,
-            @RequestParam(required = false) String author,
-            @RequestParam(required = false) String favorited,
-            @RequestParam(required = false, defaultValue = "20") Integer limit,
-            @RequestParam(required = false, defaultValue = "0") Integer offset) {
+            @RequestParam(value = "tag", required = false) String tag,
+            @RequestParam(value = "author", required = false) String author,
+            @RequestParam(value = "favorited", required = false) String favorited,
+            @RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit,
+            @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset) {
         
         String userEmail = null;
         try {
